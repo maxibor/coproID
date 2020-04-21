@@ -1,6 +1,6 @@
-# ![nf-core/coproid](docs/images/nf-core-coproid_logo.png)
+# ![nf-core/coproid](assets/img/coproid_logo.png)
 
-**Coprolite Identification**.
+**A fully reproducible pipeline for COPROlite and paleofeces host IDentification**
 
 [![GitHub Actions CI Status](https://github.com/nf-core/coproid/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/coproid/actions)
 [![GitHub Actions Linting Status](https://github.com/nf-core/coproid/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/coproid/actions)
@@ -8,12 +8,13 @@
 
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/)
 [![Docker](https://img.shields.io/docker/automated/nfcore/coproid.svg)](https://hub.docker.com/r/nfcore/coproid)
-[![Documentation Status](https://readthedocs.org/projects/coproid/badge/?version=latest)](https://coproid.readthedocs.io/en/latest/?badge=latest) 
+![Singularity Container available](https://img.shields.io/badge/singularity-available-7E4C74.svg)
+
+[![Documentation Status](https://readthedocs.org/projects/coproid/badge/?version=latest)](https://coproid.readthedocs.io/en/latest/?badge=latest)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2653756.svg)](https://doi.org/10.5281/zenodo.2653756)
 
-
-
-![logo_nf_core](assets/img/coproID_nf-core_logo.svg)
+[![Joins us on Slack](https://img.shields.io/badge/slack-nfcore/coproid-blue.svg)](https://nfcore.slack.com/channels/coproid)
+[![Published in PeerJ](https://img.shields.io/badge/peerj-published-%2300B2FF)](https://peerj.com/articles/9001)
 
 ## Introduction
 
@@ -49,14 +50,14 @@ The nf-core/coproid pipeline comes with documentation about the pipeline, found 
 
 The nf-core/coproid pipeline comes with documentation about the pipeline, found in the `docs/` directory and at the following address: [coproid.readthedocs.io](https://coproid.readthedocs.io)
 
-1.  [Installation](https://nf-co.re/usage/installation)
-2.  Pipeline configuration
-    -   [Local installation](https://nf-co.re/usage/local_installation)
-    -   [Adding your own system config](https://nf-co.re/usage/adding_own_config)
-    -   [Reference genomes](https://nf-co.re/usage/reference_genomes)
-3.  [Running the pipeline](docs/usage.md)
-4.  [Output and how to interpret the results](docs/output.md)
-5.  [Troubleshooting](https://nf-co.re/usage/troubleshooting)
+1. [Installation](https://nf-co.re/usage/installation)
+2. Pipeline configuration
+    - [Local installation](https://nf-co.re/usage/local_installation)
+    - [Adding your own system config](https://nf-co.re/usage/adding_own_config)
+    - [Reference genomes](https://nf-co.re/usage/reference_genomes)
+3. [Running the pipeline](docs/usage.md)
+4. [Output and how to interpret the results](docs/output.md)
+5. [Troubleshooting](https://nf-co.re/usage/troubleshooting)
 
 ## Credits
 

@@ -1,6 +1,6 @@
 # Introduction
 
-![](../assets/img/coproID_nf-core_logo.svg)
+![coproid_logo](../assets/img/coproid_logo.png)
 
 **coproID** (**CO**prolite **ID**entification) is a tool developed at the
 [Max Planck insitute for the Science of Human History](http://www.shh.mpg.de/en)
@@ -20,7 +20,7 @@ Example:
 
 ## coproID example workFlow
 
-![](../assets/img/coproid_dag.png)
+![coproid workflow](../assets/img/coproid_dag.png)
 
 ## How to cite coproID
 
