@@ -60,6 +60,16 @@
                         "git_sha": "0f8a77ff00e65eaeebc509b8156eaa983192474b",
                         "installed_by": ["modules"]
                     },
+                    "samtools/merge": {
+                        "branch": "master",
+                        "git_sha": "0460d316170f75f323111b4a2c0a2989f0c32013",
+                        "installed_by": ["modules"]
+                    },
+                    "samtools/sort": {
+                        "branch": "master",
+                        "git_sha": "a0f7be95788366c1923171e358da7d049eb440f9",
+                        "installed_by": ["modules"]
+                    },
                     "samtools/view": {
                         "branch": "master",
                         "git_sha": "154bbe00ffd75ceeedd69a7c9358b759a5991e49",
