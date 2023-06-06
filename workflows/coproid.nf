@@ -15,10 +15,12 @@ def checkPathParamList = [ params.input, params.multiqc_config, params.fasta ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
-if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
-if (params.genomes) { ch_genomes = Channel.fromPath(params.genomes) } else { exit 1, 'Genomes sheet not specified!' }
-if (params.sam2lca_db) { ch_sam2lca_db = Channel.fromPath(params.sam2lca_db).first() } else { exit 1, 'SAM2LCA database path not specified!' }
-if (params.kraken2_db) { ch_kraken2_db = Channel.fromPath(params.kraken2_db).first() } else { exit 1, 'Kraken2 database path not specified!' }
+if (params.input       ) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
+if (params.genomes     ) { ch_genomes = Channel.fromPath(params.genomes) } else { exit 1, 'Genomes sheet not specified!' }
+if (params.sam2lca_db  ) { ch_sam2lca_db = Channel.fromPath(params.sam2lca_db).first() } else { exit 1, 'SAM2LCA database path not specified!' }
+if (params.kraken2_db  ) { ch_kraken2_db = Channel.fromPath(params.kraken2_db).first() } else { exit 1, 'Kraken2 database path not specified!' }
+if (params.sp_sources  ) { ch_sp_sources = Channel.fromPath(params.sp_sources).first() } else { exit 1, 'SourcePredict sources file not specified!' }
+if (params.ch_sp_labels) { ch_sp_labels = Channel.fromPath(params.ch_sp_labels).first() } else { exit 1, 'SourcePredict labels file not specified!' }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,7 +47,7 @@ include { INPUT_CHECK               } from '../subworkflows/local/input_check'
 include { PREPARE_GENOMES           } from '../subworkflows/local/prepare_genomes_indices'
 include { ALIGN_INDEX               } from '../subworkflows/local/align_index'
 include { MERGE_SORT_INDEX_SAMTOOLS } from '../subworkflows/local/merge_sort_index_samtools'
-
+include { KRAKEN2_WF                } from '../subworkflows/local/kraken2_wf'
 
 //
 // MODULE: Installed directly from nf-core/modules
@@ -55,9 +57,9 @@ include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { FASTP                       } from '../modules/nf-core/fastp/main'
 include { BOWTIE2_BUILD               } from '../modules/nf-core/bowtie2/build/main'
-include { SAM2LCA                     } from '../modules/nf-core/sam2lca/main'
-include { KRAKEN2                     } from '../modules/nf-core/kraken2/kraken2/main'
 include { SAMTOOLS_MERGE              } from '../modules/nf-core/samtools/merge/main'
+include { SAM2LCA                     } from '../modules/nf-core/sam2lca/main'
+include { SOURCEPREDICT               } from '../modules/local/sourcepredict'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -149,9 +151,15 @@ workflow COPROID {
         ch_sam2lca_db
     )
 
-    KRAKEN2(
+    KRAKEN2_WF(
         FASTP.out.reads_merged,
         ch_kraken2_db
+    )
+
+    SOURCEPREDICT (
+        KRAKEN2_WF.out.kraken2_report,
+        ch_sp_sources,
+        ch_sp_labels
     )
 
 
