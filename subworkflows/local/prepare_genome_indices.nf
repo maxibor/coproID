@@ -1,4 +1,4 @@
-include { BOWTIE2_BUILD } from '../modules/nf-core/bowtie2/build/main'
+include { BOWTIE2_BUILD } from '../../modules/nf-core/bowtie2/build/main'
 
 workflow PREPARE_GENOMES {
     take:
@@ -14,8 +14,8 @@ workflow PREPARE_GENOMES {
 
         genomes
             .branch {
-                index_avail: it.size() == 2
-                no_index_avail: it.size() > 2
+                index_avail: it.size() > 2
+                no_index_avail: it.size() == 2
             }
             .set { genomes_fork }
 
@@ -27,9 +27,9 @@ workflow PREPARE_GENOMES {
             BOWTIE2_BUILD.out.index
         ).mix(
             genomes_fork.index_avail
-        ).set (
+        ).set {
             ch_genomes
-        )
+        }
 
         ch_versions = ch_versions.mix(BOWTIE2_BUILD.out.versions.first())
 

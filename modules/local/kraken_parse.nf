@@ -8,11 +8,11 @@ process KRAKEN_PARSE {
         'quay.io/biocontainers/pandas:1.4.3' }"
 
     input:
-    path kraken2_report
+    tuple val(meta), path(kraken2_report)
 
     output:
-    path("*.read_kraken_parsed.csv") into kraken_read_count
-    path("*.kmer_kraken_parsed.csv") into kraken_kmer_count
+    tuple val(meta), path("*.read_kraken_parsed.csv"), emit: kraken_read_count
+    tuple val(meta), path("*.kmer_kraken_parsed.csv"), emit: kraken_kmer_count
 
     script:
     def args = task.ext.args   ?: ''

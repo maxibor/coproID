@@ -11,16 +11,16 @@ WorkflowCoproid.initialise(params, log)
 
 // TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
-def checkPathParamList = [ params.input, params.multiqc_config, params.fasta ]
+def checkPathParamList = [ params.input, params.multiqc_config ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
 if (params.input       ) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
-if (params.genomes     ) { ch_genomes = Channel.fromPath(params.genomes) } else { exit 1, 'Genomes sheet not specified!' }
-if (params.sam2lca_db  ) { ch_sam2lca_db = Channel.fromPath(params.sam2lca_db).first() } else { exit 1, 'SAM2LCA database path not specified!' }
-if (params.kraken2_db  ) { ch_kraken2_db = Channel.fromPath(params.kraken2_db).first() } else { exit 1, 'Kraken2 database path not specified!' }
-if (params.sp_sources  ) { ch_sp_sources = Channel.fromPath(params.sp_sources).first() } else { exit 1, 'SourcePredict sources file not specified!' }
-if (params.ch_sp_labels) { ch_sp_labels = Channel.fromPath(params.ch_sp_labels).first() } else { exit 1, 'SourcePredict labels file not specified!' }
+if (params.genome_sheet) { ch_genomes    = Channel.fromPath(params.genome_sheet) } else { exit 1, 'Genomes sheet not specified!' }
+if (params.sam2lca_db  ) { ch_sam2lca_db = file(params.sam2lca_db) } else { exit 1, 'SAM2LCA database path not specified!' }
+if (params.kraken2_db  ) { ch_kraken2_db = file(params.kraken2_db) } else { exit 1, 'Kraken2 database path not specified!' }
+if (params.sp_sources  ) { ch_sp_sources = file(params.sp_sources) } else { exit 1, 'SourcePredict sources file not specified!' }
+if (params.sp_labels   ) { ch_sp_labels  = file(params.sp_labels) } else { exit 1, 'SourcePredict labels file not specified!' }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,7 +44,7 @@ ch_multiqc_custom_methods_description = params.multiqc_methods_description ? fil
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK               } from '../subworkflows/local/input_check'
-include { PREPARE_GENOMES           } from '../subworkflows/local/prepare_genomes_indices'
+include { PREPARE_GENOMES           } from '../subworkflows/local/prepare_genome_indices'
 include { ALIGN_INDEX               } from '../subworkflows/local/align_index'
 include { MERGE_SORT_INDEX_SAMTOOLS } from '../subworkflows/local/merge_sort_index_samtools'
 include { KRAKEN2_WF                } from '../subworkflows/local/kraken2_wf'
@@ -58,7 +58,7 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoft
 include { FASTP                       } from '../modules/nf-core/fastp/main'
 include { BOWTIE2_BUILD               } from '../modules/nf-core/bowtie2/build/main'
 include { SAMTOOLS_MERGE              } from '../modules/nf-core/samtools/merge/main'
-include { SAM2LCA                     } from '../modules/nf-core/sam2lca/main'
+include { SAM2LCA_ANALYZE             } from '../modules/nf-core/sam2lca/analyze/main'
 include { SOURCEPREDICT               } from '../modules/local/sourcepredict'
 
 /*
@@ -85,8 +85,9 @@ workflow COPROID {
     /*
     SUBWORKFLOW: Genomes in genome sheet, validate and stage genome fasta, and indices
     */
+
     PREPARE_GENOMES (
-        genomes
+        ch_genomes
     )
     ch_versions = ch_versions.mix(PREPARE_GENOMES.out.versions.first())
 
@@ -96,7 +97,10 @@ workflow COPROID {
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
     FASTP (
-        INPUT_CHECK.out.reads
+        INPUT_CHECK.out.reads,
+        [],
+        false,
+        true
     )
     ch_versions = ch_versions.mix(FASTP.out.versions.first())
 
@@ -113,9 +117,10 @@ workflow COPROID {
                     'id': meta_reads.id + '_' + meta_genome.genome_name,
                     'genome_name': meta_genome.genome_name,
                     'genome_taxid': meta_genome.taxid,
-                    'genome_size': meta.genome_size,
+                    'genome_size': meta_genome.genome_size,
                     'sample_name': meta_reads.id,
-                    'single_end': meta_reads.single_end
+                    'single_end': meta_reads.single_end,
+                    'merge': meta_reads.merge
                 ],
                 reads,
                 genome_index
@@ -133,8 +138,8 @@ workflow COPROID {
     ch_versions = ch_versions.mix(ALIGN_INDEX.out.versions.first())
 
 
-    ALIGN_BOWTIE2.out.bam.join(
-        ALIGN_BOWTIE2.out.bai
+    ALIGN_INDEX.out.bam.join(
+        ALIGN_INDEX.out.bai
     ).map {
         meta, bam, bai -> [['id':meta.sample_name], bam] // meta.id, bam
     }.groupTuple()
@@ -144,7 +149,7 @@ workflow COPROID {
         bams_synced
     )
 
-    SAM2LCA (
+    SAM2LCA_ANALYZE (
         MERGE_SORT_INDEX_SAMTOOLS.out.bam.join(
             MERGE_SORT_INDEX_SAMTOOLS.out.bai
         ),
@@ -157,7 +162,7 @@ workflow COPROID {
     )
 
     SOURCEPREDICT (
-        KRAKEN2_WF.out.kraken2_report,
+        KRAKEN2_WF.out.kraken_merged_report,
         ch_sp_sources,
         ch_sp_labels
     )

@@ -10,7 +10,10 @@
             "type": "object",
             "fa_icon": "fas fa-terminal",
             "description": "Define where the pipeline should find input data and save output data.",
-            "required": ["input", "outdir"],
+            "required": [
+                "input",
+                "outdir"
+            ],
             "properties": {
                 "input": {
                     "type": "string",
@@ -48,20 +51,12 @@
             "fa_icon": "fas fa-dna",
             "description": "Reference genome related files and options required for the workflow.",
             "properties": {
-                "genome": {
+                "genome_sheet": {
                     "type": "string",
-                    "description": "Name of iGenomes reference.",
-                    "fa_icon": "fas fa-book",
-                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
-                },
-                "fasta": {
-                    "type": "string",
-                    "format": "file-path",
-                    "mimetype": "text/plain",
-                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                    "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
-                    "fa_icon": "far fa-file-code"
+                    "default": "None",
+                    "fa_icon": "fas fa-border-all",
+                    "description": "Path to comma-separated file containing information about the reference genomes",
+                    "help_text": "You will need to create a design file with information about the references genomes before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 6 columns, and a header row. See [usage docs](https://nf-co.re/coproid/usage#genomesheet)."
                 },
                 "igenomes_base": {
                     "type": "string",
@@ -79,6 +74,41 @@
                     "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
                 }
             }
+        },
+        "reference_databases": {
+            "title": "Reference databases",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "properties": {
+                "sam2lca_db": {
+                    "type": "string",
+                    "default": "None",
+                    "description": "Path to sam2lca database directory"
+                },
+                "kraken2_db": {
+                    "type": "string",
+                    "default": "None",
+                    "description": "Path to Kraken2 database directory"
+                },
+                "sp_sources": {
+                    "type": "string",
+                    "default": "None",
+                    "description": "Path to sourcepredict sources file"
+                },
+                "sp_labels": {
+                    "type": "string",
+                    "default": "None",
+                    "description": "Path to sourcepredict source labels file"
+                }
+            },
+            "required": [
+                "sam2lca_db",
+                "kraken2_db",
+                "sp_sources",
+                "sp_labels"
+            ],
+            "fa_icon": "fas fa-database"
         },
         "institutional_config_options": {
             "title": "Institutional config options",
@@ -188,7 +218,14 @@
                     "description": "Method used to save pipeline results to output directory.",
                     "help_text": "The Nextflow `publishDir` option specifies which intermediate files should be saved to the output directory. This option tells the pipeline what method should be used to move these files. See [Nextflow docs](https://www.nextflow.io/docs/latest/process.html#publishdir) for details.",
                     "fa_icon": "fas fa-copy",
-                    "enum": ["symlink", "rellink", "link", "copy", "copyNoFollow", "move"],
+                    "enum": [
+                        "symlink",
+                        "rellink",
+                        "link",
+                        "copy",
+                        "copyNoFollow",
+                        "move"
+                    ],
                     "hidden": true
                 },
                 "email_on_fail": {
@@ -273,6 +310,9 @@
         },
         {
             "$ref": "#/definitions/reference_genome_options"
+        },
+        {
+            "$ref": "#/definitions/reference_databases"
         },
         {
             "$ref": "#/definitions/institutional_config_options"

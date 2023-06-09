@@ -28,7 +28,7 @@ process BOWTIE2_ALIGN {
 
     def unaligned = ""
     def reads_args = ""
-    if (meta.single_end) {
+    if (meta.single_end || meta.merge) {
         unaligned = save_unaligned ? "--un-gz ${prefix}.unmapped.fastq.gz" : ""
         reads_args = "-U ${reads}"
     } else {
